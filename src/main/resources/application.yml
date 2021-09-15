@@ -1,0 +1,48 @@
+# Spring Cloud Gateway port
+server:
+  port: 8080
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  cloud:
+    gateway:
+      # Gateway 공통 필터
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway GlobalFilter
+            preLogger: true
+            postLogger: true
+      # MSA 라우팅 정의
+      # ID, 목적지(uri), 조건(Predicate), 필터로 구성된다.
+      routes:
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/user/**
+          filters:
+            - name: UserFilter
+              args:
+                baseMessage: Taeu UserFilter
+                preLogger: true
+                postLogger: true
+
+        - id: auth-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/auth/**
+          filters:
+            - name: AuthFilter
+              args:
+                baseMessage: Taeu AuthFilter
+                preLogger: true
+                postLogger: true
+
+token:
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
